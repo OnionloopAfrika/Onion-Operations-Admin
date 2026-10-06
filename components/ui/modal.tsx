@@ -10,6 +10,7 @@ interface ModalProps {
   footer?: React.ReactNode;
   size?: "sm" | "md" | "lg";
   className?: string;
+  titleClassName?: string;
 }
 
 export function Modal({
@@ -21,6 +22,7 @@ export function Modal({
   footer,
   size = "md",
   className = "",
+  titleClassName = "",
 }: ModalProps) {
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -54,22 +56,16 @@ export function Modal({
         {(title || description) && (
           <div className="flex-shrink-0 border-b border-gray-200 px-6 py-4 space-y-[12px]">
             {title && (
-              <h2 className="text-[20px] font-bold text-center ">{title}</h2>
+              <h2 className={`text-[20px] font-bold text-center ${titleClassName} `}>{title}</h2>
             )}
-            {description && (
-              <p className="text-[14px] text-[#6C6C6C] text-center">
-                {description}
-              </p>
-            )}
+            {description && <p className="text-[14px] text-[#6C6C6C] text-center">{description}</p>}
           </div>
         )}
 
         <div className="flex-1 overflow-auto p-6">{children}</div>
 
         {footer && (
-          <div className="flex-shrink-0 border-t border-gray-200 px-6 py-4 bg-white">
-            {footer}
-          </div>
+          <div className="flex-shrink-0 border-t border-gray-200 px-6 py-4 bg-white">{footer}</div>
         )}
       </div>
     </div>

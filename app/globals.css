@@ -59,3 +59,15 @@ input[type="time"]::-moz-calendar-picker-indicator,
 input[type="datetime-local"]::-moz-calendar-picker-indicator {
   display: none;
 }
+
+table tbody td {
+  color: #6c6c6c;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+@media (max-width: 63.999rem) {
+  table tbody td {
+    font-size: 12px;
+  }
+}
