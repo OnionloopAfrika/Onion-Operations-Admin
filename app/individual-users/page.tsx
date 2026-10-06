@@ -1,9 +1,10 @@
-import { Shell } from '@/components/shell';
+import IndividualUsers from "@/components/individual-users/individual-users";
+import { Shell } from "@/components/shell";
 
 export default function IndividualUsersPage() {
   return (
     <Shell>
-      <h1 className="text-2xl font-semibold text-[#131313]">Individual Users</h1>
+      <IndividualUsers />
     </Shell>
   );
 }

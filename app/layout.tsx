@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import {
-
-  Poppins
-} from "next/font/google";
+import { Poppins } from "next/font/google";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,11 +13,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-poppins"
+  variable: "--font-poppins",
 });
 
 export const metadata: Metadata = {
@@ -29,8 +25,16 @@ export const metadata: Metadata = {
     default: "Onionloop | Fast, Secure & Rewarding Payments in Africa",
     template: "%s | Onionloop Africa",
   },
-  description: "Onionloop makes payments simple for everyday people and businesses across Africa. Scan QR codes, send money instantly, and earn rewards with every transaction.",
-  keywords: ["Onionloop", "QR payments Africa", "instant money transfer", "digital wallet Nigeria", "business payment solutions Africa", "secure payments"],
+  description:
+    "Onionloop makes payments simple for everyday people and businesses across Africa. Scan QR codes, send money instantly, and earn rewards with every transaction.",
+  keywords: [
+    "Onionloop",
+    "QR payments Africa",
+    "instant money transfer",
+    "digital wallet Nigeria",
+    "business payment solutions Africa",
+    "secure payments",
+  ],
   authors: [{ name: "Onionloop Team" }],
   creator: "Onionloop Africa",
   publisher: "Onionloop",
@@ -45,7 +49,8 @@ export const metadata: Metadata = {
     url: "https://www.staging.onionloopafrika.com",
     siteName: "Onionloop Africa",
     title: "Onionloop | Making Payments Simple and Rewarding",
-    description: "Join the loop. Experience the future of African payments with instant QR transfers and encrypted security.",
+    description:
+      "Join the loop. Experience the future of African payments with instant QR transfers and encrypted security.",
     images: [
       {
         url: "/og-image.png",
@@ -89,7 +94,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} antialiased bg-[#F7F7F7]`}
       >
         {children}
       </body>
