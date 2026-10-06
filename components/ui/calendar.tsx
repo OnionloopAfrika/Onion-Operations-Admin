@@ -8,6 +8,8 @@ interface CalendarProps {
   events?: Record<string, boolean>;
 }
 
+// ...////
+
 export function Calendar({ value, onChange, events = {} }: CalendarProps) {
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(value || today);
@@ -32,9 +34,7 @@ export function Calendar({ value, onChange, events = {} }: CalendarProps) {
     const selected = new Date(value);
 
     return (
-      selected.getDate() === day &&
-      selected.getMonth() === month &&
-      selected.getFullYear() === year
+      selected.getDate() === day && selected.getMonth() === month && selected.getFullYear() === year
     );
   };
 
@@ -86,10 +86,7 @@ export function Calendar({ value, onChange, events = {} }: CalendarProps) {
 
       <div className="grid grid-cols-7 text-center text-[14px] mb-[10px]">
         {weekDays.map((day, i) => (
-          <span
-            key={day}
-            className={i === 0 || i === 6 ? "text-red-500" : "text-[#131313]"}
-          >
+          <span key={day} className={i === 0 || i === 6 ? "text-red-500" : "text-[#131313]"}>
             {day}
           </span>
         ))}
@@ -132,9 +129,7 @@ export function Calendar({ value, onChange, events = {} }: CalendarProps) {
                 {day}
               </div>
 
-              {hasEvent && (
-                <div className="w-[6px] h-[6px] bg-green-500 rounded-full mt-[4px]" />
-              )}
+              {hasEvent && <div className="w-[6px] h-[6px] bg-green-500 rounded-full mt-[4px]" />}
             </button>
           );
         })}
