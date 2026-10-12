@@ -7,6 +7,7 @@ import { Modal } from "../ui/modal";
 import Image from "next/image";
 import Select from "../ui/select";
 import Textarea from "../ui/textarea";
+import Badge from "../ui/badge";
 
 export default function Agent() {
   const [open, setOpen] = useState(false);
@@ -67,9 +68,9 @@ export default function Agent() {
     <>
       <div className="space-y-[24px]">
         <div className="flex items-center justify-between gap-[16px] max-lg:flex-col max-lg:items-stretch max-lg:gap-[16px]">
-          <div className="w-fit max-w-full rounded-full bg-[#E3EFFC] p-[8px] font-[500] text-[10px] text-[#0D5EBA]">
+          <Badge variant="system">
             2 selected for bulk approval - all high-confidence, clean matches
-          </div>
+          </Badge>
 
           <div className="flex items-center gap-[10px] max-lg:grid max-lg:w-full max-lg:grid-cols-1">
             <Button
@@ -79,7 +80,7 @@ export default function Agent() {
               children="Clear"
             />
 
-            <button className="w-full py-[8px] px-[12px] bg-[#F5FFFD] font-[500] text-[16px] text-[#04907E] shadow-sm">
+            <button className="w-full py-[8px] px-[12px] bg-[#F5FFFD] font-[500] text-[16px] text-[#04907E] shadow-sm  whitespace-nowrap">
               Approve 2 selected
             </button>
           </div>
@@ -100,26 +101,12 @@ export default function Agent() {
                     <div className="flex flex-wrap items-center gap-[8px]">
                       <p className="font-[600] text-[16px] text-[#000000]">{item.name}</p>
 
-                      {item.system === "High" ? (
-                        <>
-                          <span className="bg-[#E3EFFC] py-[8px] px-[8px] rounded-full font-[500] text-[10px] text-[#0D5EBA]">
-                            System:{item.system}
-                          </span>
-
-                          <span className="bg-[#E7F6EC] py-[8px] px-[8px] rounded-full font-[500] text-[10px] text-[#04802E]">
-                            Address:{item.address}
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="bg-[#FBEAE9] py-[8px] px-[8px] rounded-full font-[500] text-[10px] text-[#CB1A14]">
-                            System:{item.system}
-                          </span>
-                          <span className="bg-[#FEF6E7] py-[8px] px-[8px] rounded-full font-[500] text-[10px] text-[#DD900D]">
-                            Address:{item.address}
-                          </span>
-                        </>
-                      )}
+                      <Badge variant={item.system === "High" ? "system" : "failed"}>
+                        System: {item.system}
+                      </Badge>
+                      <Badge variant={item.address === "Verified" ? "active" : "pending"}>
+                        Address: {item.address}
+                      </Badge>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-[8px] font-[400] text-[12px] text-[#6C6C6C]">
@@ -154,7 +141,7 @@ export default function Agent() {
                   variant="cashierOutline"
                   size="cashierOutline"
                   children="View documents"
-                  className="w-full"
+                  className="w-full flex  items-center justify-center whitespace-nowrap"
                 />
                 <Button
                   onClick={() => setReject(true)}

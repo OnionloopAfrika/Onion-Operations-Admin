@@ -5,10 +5,11 @@ import { TrashIcon } from "@/components/icons/svgs";
 import { Shell } from "@/components/shell";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import Button from "@/components/ui/button";
+import Badge, { type BadgeVariant } from "@/components/ui/badge";
 import Input from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import Textarea from "@/components/ui/textarea";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import React, { Suspense, useState } from "react";
 
 export default function Page() {
@@ -32,10 +33,33 @@ function MerchantDetailsPage() {
 function MerchantDetails({ firstTab }: { firstTab: string }) {
   const [openTerminate, setOpenTerminate] = useState(false);
   const [openRequest, setOpenRequest] = useState(false);
-
+  const routeParams = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const source = searchParams.get("source");
   const onion_mega = source === "OnionMega";
+  const id = Number(routeParams.id);
+  const isTableMerchant =
+    source === "OnionSolo" || source === "OnionCrew" || source === "OnionMega";
+  const businessName = isTableMerchant
+    ? (searchParams.get("business") ?? "Merchant")
+    : "Mama Nkechi Kitchen";
+  const ownerName = isTableMerchant
+    ? (searchParams.get("owner") ?? "Not available")
+    : "Nkechi Umeh";
+  const feeRate = isTableMerchant
+    ? (searchParams.get("feeRate") ?? "Not available")
+    : "1.5%";
+  const staffCount = source === "OnionCrew" ? searchParams.get("staff") : null;
+  const megaStaffCount = source === "OnionMega" ? searchParams.get("staff") : null;
+  const branchCount = source === "OnionMega" ? searchParams.get("branches") : null;
+  const status = isTableMerchant ? searchParams.get("status") : "Active";
+  const statusVariant: BadgeVariant = status === "Pending Approval" ? "pending" : "active";
+  const initials = businessName
+    .split(/\s+/)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   const roster_details = [
     { name: "Tobi Adeyanju", role: "Cashier" },
@@ -54,17 +78,24 @@ function MerchantDetails({ firstTab }: { firstTab: string }) {
           <div className="flex justify-between items-center max-lg:grid max-lg:grid-cols-1 max-lg:gap-[20px]">
             <div className="flex gap-[12px]">
               <div className="w-[40px] h-[40px] flex justify-center items-center bg-[#D6F0DF] font-[600] text-[16px] text-[#024E44]">
-                <p>MK</p>
+                <p>{initials}</p>
               </div>
               <div className=" space-y-[4px]">
                 <div className="flex gap-[10px]">
-                  <p className="font-[600] text-[16px] text-[#131313]">Mama Nkechi Kitchen</p>
-
-                  <span className="bg-[#E7F6EC] py-[2px] px-[12px] flex justify-center items-center font-[500] text-[12px] text-[#04802E] rounded-full">
-                    Active
-                  </span>
+                  <p className="font-[600] text-[16px] text-[#131313]">{businessName}</p>
+                  {status ? (
+                    <Badge variant={statusVariant}>{status}</Badge>
+                  ) : (
+                    <span className="font-[500] text-[12px] text-[#6C6C6C]">
+                      Status unavailable
+                    </span>
+                  )}
                 </div>
-                <p className="font-[500] text-[14px] text-[#6C6C6C]">MER-201</p>
+                <p className="font-[500] text-[14px] text-[#6C6C6C]">
+                  {isTableMerchant && Number.isInteger(id)
+                    ? `MER-${String(id).padStart(3, "0")}`
+                    : "MER-201"}
+                </p>
               </div>
             </div>
 
@@ -78,6 +109,18 @@ function MerchantDetails({ firstTab }: { firstTab: string }) {
 
           {onion_mega && (
             <div className="space-y-[24px]">
+              {(branchCount || megaStaffCount || ownerName || feeRate) && (
+                <div className="p-[24px] rounded-[12px] space-y-[16px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#E5E7EB]">
+                  <Heading title="Merchant Details" />
+                  <div className="grid grid-cols-2 gap-[16px] max-sm:grid-cols-1">
+                    {ownerName && <Details title="Owner:" value={ownerName} />}
+                    {branchCount && <Details title="Branches:" value={branchCount} />}
+                    {megaStaffCount && <Details title="Staff:" value={megaStaffCount} />}
+                    {feeRate && <Details title="Fee Rate (charged to merchant):" value={feeRate} />}
+                  </div>
+                </div>
+              )}
+
               <div className="p-[24px] rounded-[12px] space-y-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#E5E7EB]">
                 <Heading title="Staff Roster" />
                 <div className="space-y-[16px]">
@@ -134,11 +177,11 @@ function MerchantDetails({ firstTab }: { firstTab: string }) {
 
               <div className="flex  gap-[400px] max-lg:grid max-lg:grid-cols-1 max-lg:gap-[20px]">
                 <div className="space-y-[20px]">
-                  <Details title="Owner:" value="Nkechi Umeh" />
+                  <Details title="Owner:" value={ownerName} />
 
                   <Details
                     title="Fee Rate (charged to merchant):"
-                    value="1.5%"
+                    value={feeRate}
                     text={
                       <p className="cursor-pointer" onClick={() => setOpenRequest(true)}>
                         Request change
@@ -146,10 +189,18 @@ function MerchantDetails({ firstTab }: { firstTab: string }) {
                     }
                   />
 
-                  <Details title="Address:" value="Plot 7, Oke-Ira, Ogba, Lagos" />
+                  {staffCount && <Details title="Staff:" value={staffCount} />}
+
+                  <Details
+                    title="Address:"
+                    value={isTableMerchant ? "Not available" : "Plot 7, Oke-Ira, Ogba, Lagos"}
+                  />
                 </div>
 
-                <Details title="Phone Number:" value="0803 111 2201" />
+                <Details
+                  title="Phone Number:"
+                  value={isTableMerchant ? "Not available" : "0803 111 2201"}
+                />
               </div>
             </div>
           )}
@@ -174,7 +225,7 @@ function MerchantDetails({ firstTab }: { firstTab: string }) {
 
               <p className="font-[400] text-[16px] text-[#363636] text-center">
                 You are about to terminate partnership with OnionSolo merchant user
-                <p className="font-[600] text-[16px] text-[#363636]">Mama Nkechi Kitchen.</p>
+                <p className="font-[600] text-[16px] text-[#363636]">{businessName}.</p>
               </p>
 
               <p className="font-[400] text-[16px] text-[#363636] text-center">
@@ -201,13 +252,13 @@ function MerchantDetails({ firstTab }: { firstTab: string }) {
         <div className="space-y-[48px]">
           <div className="space-y-[24px]">
             <p className="font-[700] text-[24px] text-[#04907E] text-center">
-              Request Fee Change — Mama Nkechi Kitchen
+              Request Fee Change — {businessName}
             </p>
 
             <div className="space-y-[16px]">
               <p className="flex items-center gap-[4px] font-[400] text-[12px] text-[#8A8A8A]">
                 Current rate:
-                <span className="font-[600] text-[12px] text-[#131313]">1.5%</span>
+                <span className="font-[600] text-[12px] text-[#131313]">{feeRate}</span>
               </p>
 
               <div className="space-y-[32px]">

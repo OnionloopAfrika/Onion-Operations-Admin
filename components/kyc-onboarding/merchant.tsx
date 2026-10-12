@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Button from "../ui/button";
+import Badge from "../ui/badge";
 import { DotIcon, MarkIcon } from "../icons/svgs";
 import { Modal } from "../ui/modal";
 import Image from "next/image";
@@ -81,26 +82,12 @@ export default function Merchant() {
                     <div className="flex flex-wrap items-center gap-[8px]">
                       <p className="font-[600] text-[16px] text-[#000000]">{item.name}</p>
 
-                      {item.system === "High" ? (
-                        <>
-                          <span className="bg-[#E3EFFC] py-[8px] px-[8px] rounded-full font-[500] text-[10px] text-[#0D5EBA]">
-                            System:{item.system}
-                          </span>
-
-                          <span className="bg-[#E7F6EC] py-[8px] px-[8px] rounded-full font-[500] text-[10px] text-[#04802E]">
-                            Address:{item.address}
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="bg-[#FBEAE9] py-[8px] px-[8px] rounded-full font-[500] text-[10px] text-[#CB1A14]">
-                            System:{item.system}
-                          </span>
-                          <span className="bg-[#FBEAE9] py-[8px] px-[8px] rounded-full font-[500] text-[10px] text-[#CB1A14]">
-                            Address:{item.address}
-                          </span>
-                        </>
-                      )}
+                      <Badge variant={item.system === "High" ? "system" : "failed"}>
+                        System: {item.system}
+                      </Badge>
+                      <Badge variant={item.address === "Verified" ? "active" : "pending"}>
+                        Address: {item.address}
+                      </Badge>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-[8px] font-[400] text-[12px] text-[#6C6C6C]">
@@ -133,7 +120,7 @@ export default function Merchant() {
                   variant="cashierOutline"
                   size="cashierOutline"
                   children="View documents"
-                  className="w-full"
+                  className="w-full flex items-center justify-center whitespace-nowrap"
                 />
                 <Button
                   onClick={() => setReject(true)}

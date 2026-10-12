@@ -6,7 +6,16 @@ import { Shell } from "@/components/shell";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import Button from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
+import Badge, { type BadgeVariant } from "@/components/ui/badge";
+import { initialUsers, type User, type UserStatus } from "@/components/individual-users/user-data";
+import { useParams, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
+
+const statusVariants: Record<UserStatus, BadgeVariant> = {
+  Active: "active",
+  Dormant: "dormant",
+  Suspended: "suspended",
+};
 
 const recentTrans = [
   { trans: "Scan-to-Pay — Sisi Yemmie Grills", date: "· Today, 10:42am" },
@@ -17,42 +26,64 @@ const recentTrans = [
 ];
 
 export default function Page() {
+  const { id } = useParams<{ id: string }>();
+  const statusParam = useSearchParams().get("status");
+  const user = initialUsers.find((item) => item.id === Number(id));
+
+  if (!user) {
+    return (
+      <Shell>
+        <div className="py-[48px] text-center text-[16px] text-[#6C6C6C]">User not found.</div>
+      </Shell>
+    );
+  }
+
+  const initialStatus = isUserStatus(statusParam) ? statusParam : user.status;
+  return <IndividualUserDetails key={user.id} user={user} initialStatus={initialStatus} />;
+}
+
+function isUserStatus(status: string | null): status is UserStatus {
+  return status === "Active" || status === "Dormant" || status === "Suspended";
+}
+
+function IndividualUserDetails({
+  user,
+  initialStatus,
+}: {
+  user: User;
+  initialStatus: UserStatus;
+}) {
   const [opensuspend, setOpensuspend] = useState(false);
-  const [suspended, setSuspended] = useState(true);
+  const [status, setStatus] = useState<UserStatus>(initialStatus);
   const [openReactivate, setOpenReactivate] = useState(false);
+  const initials = user.name
+    .split(/\s+/)
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   return (
     <>
       <Shell>
         <div className="space-y-[24px]">
-          <Breadcrumb firstTab="Individual User" secondTab="User" />
+          <Breadcrumb firstTab="Individual User" secondTab={user.name} />
 
           <div className="flex justify-between max-lg:grid max-lg:grid-cols-1 max-lg:gap-[20px] items-center">
             <div className="flex gap-[12px]">
               <div className="w-[40px] h-[40px] flex justify-center items-center bg-[#D6F0DF] font-[600] text-[16px] text-[#024E44]">
-                <p>CO</p>
+                <p>{initials}</p>
               </div>
               <div className=" space-y-[4px]">
-                <div className="flex gap-[10px]">
-                  <p className="font-[600] text-[16px] text-[#131313]">Chiamaka Obi</p>
-
-                  {!suspended && (
-                    <span className="bg-[#FBEAE9] py-[2px] px-[12px] flex justify-center items-center font-[500] text-[12px] text-[#CB1A14] rounded-full">
-                      Suspended
-                    </span>
-                  )}
-
-                  {suspended && (
-                    <span className="bg-[#E7F6EC] py-[2px] px-[12px] flex justify-center items-center font-[500] text-[12px] text-[#04802E] rounded-full">
-                      Active
-                    </span>
-                  )}
+                <div className="flex items-center gap-[10px]">
+                  <p className="font-[600] text-[16px] text-[#131313]">{user.name}</p>
+                  <Badge variant={statusVariants[status]}>{status}</Badge>
                 </div>
-                <p className="font-[500] text-[14px] text-[#6C6C6C]">0803 221 4409</p>
+                <p className="font-[500] text-[14px] text-[#6C6C6C]">{user.phoneNumber}</p>
               </div>
             </div>
 
-            {!suspended && (
+            {status !== "Active" && (
               <div
                 onClick={() => setOpenReactivate(true)}
                 className="bg-[#04907E] py-[8px] px-[12px] flex cursor-pointer justify-center items-center rounded-[8px] font-[500] text-[16px] text-white"
@@ -61,7 +92,7 @@ export default function Page() {
               </div>
             )}
 
-            {suspended && (
+            {status === "Active" && (
               <div
                 onClick={() => setOpensuspend(true)}
                 className="bg-[#FBEAE9] py-[8px] px-[12px] cursor-pointer flex justify-center items-center rounded-[8px] font-[500] text-[16px] text-[#CB1A14]"
@@ -71,7 +102,7 @@ export default function Page() {
             )}
           </div>
 
-          {!suspended && (
+          {(status === "Suspended" || user.flags > 0) && (
             <div className="bg-[#FBEAE9] p-[16px] rounded-[8px] flex items-center gap-[4px]">
               <span className="font-[500] text-[14px] text-[#CB1A14]">Flag reason:</span>{" "}
               <span className="font-[400] text-[14px] text-[#363636]">
@@ -85,6 +116,9 @@ export default function Page() {
 
             <div className="flex  gap-[400px] max-lg:grid max-lg:grid-cols-1 max-lg:gap-[20px]">
               <div className="space-y-[20px]">
+                <Details title="KYC Level:" value={user.kycLevel} />
+                <Details title="Date Joined:" value={user.dateJoined} />
+                <Details title="Flags:" value={String(user.flags)} />
                 <Details title="Email:" value="chiamakaobi@gmail.com" />
 
                 <Details title="Address:" value="Plot 7, Oke-Ira, Ogba, Lagos" />
@@ -119,7 +153,7 @@ export default function Page() {
             <div className="space-y-[8px] text-center">
               <p className="font-[700] text-[24px] text-[#04907E]">Suspend Individual User?</p>
               <p className="font-[400] text-[16px] text-[#363636]">
-                Suspending stops user Chiamaka Obi from processing any further transactions
+                Suspending stops user {user.name} from processing any further transactions
               </p>
             </div>
           </div>
@@ -128,7 +162,7 @@ export default function Page() {
             <Button onClick={() => setOpensuspend(false)} variant="secondary" children="Cancel" />
             <Button
               onClick={() => {
-                (setOpensuspend(false), setSuspended(false));
+                (setOpensuspend(false), setStatus("Suspended"));
               }}
               variant="danger"
               children="Suspend Access"
@@ -145,7 +179,7 @@ export default function Page() {
             </p>
 
             <p className="font-[400] text-center text-[16px] text-[#363636]">
-              You are about tp reactivate user Chiamaka Obi account. This action is logged in the
+              You are about tp reactivate user {user.name} account. This action is logged in the
               audit trail.
             </p>
           </div>
@@ -157,7 +191,7 @@ export default function Page() {
             />
             <Button
               onClick={() => {
-                (setSuspended(true), setOpenReactivate(false));
+                (setStatus("Active"), setOpenReactivate(false));
               }}
               variant="primary"
               children="Confirm"

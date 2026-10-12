@@ -1,12 +1,24 @@
+import { createElement, type FC } from "react";
 import { NavItem } from "@/types/types";
-import { DashboardIcon, UsersIcon, ReportsIcon } from "./icons/svgs";
+import { ActiveAgentIcon, DashboardIcon, UsersIcon, ReportsIcon } from "./icons/svgs";
 import { KycOnboardingIcon } from "./icons/kyc-onboarding";
 import { DisputesEscalationsIcon } from "./icons/disputes-escalations";
 import { IndividualUsersIcon } from "./icons/individual-users";
 import { AgentsIcon } from "./icons/agents";
 import { AggregatorsIcon } from "./icons/aggregators";
+import { ActiveAggregator, type IconProps } from "./icons/svgs";
 import { FeeCommissionIcon } from "./icons/fee-commission";
 import { AuditLogIcon } from "./icons/audit-log";
+
+const AggregatorNavIcon: FC<IconProps> = (props) =>
+  props.active
+    ? createElement(ActiveAggregator, { size: props.size, className: props.className })
+    : createElement(AggregatorsIcon, props);
+
+const AgentNavIcon: FC<IconProps> = (props) =>
+  props.active
+    ? createElement(ActiveAgentIcon, { size: props.size, className: props.className })
+    : createElement(AgentsIcon, props);
 
 export const DEFAULT_NAV_ITEMS: NavItem[] = [
   {
@@ -48,14 +60,14 @@ export const DEFAULT_NAV_ITEMS: NavItem[] = [
     id: "agents",
     label: "Agents",
     href: "/agents",
-    icon: AgentsIcon,
+    icon: AgentNavIcon,
     section: "Network",
   },
   {
     id: "aggregators",
     label: "Aggregators",
     href: "/aggregators",
-    icon: AggregatorsIcon,
+    icon: AggregatorNavIcon,
     section: "Network",
   },
   {

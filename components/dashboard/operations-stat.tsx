@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { ArrowRight, RightArrowIcon } from "../icons/svgs";
 import StatGrid from "../ui/stat-grid";
 
@@ -7,6 +9,7 @@ const COLORED_GRID = [
     value: "7",
     desc: "KYC Reviewing Pending",
     action: "Needs action",
+    url: "/kyc-onboarding",
   },
 
   {
@@ -19,12 +22,14 @@ const COLORED_GRID = [
     value: "2",
     desc: "Merchants Application",
     action: "Needs action",
+    url: "/merchants",
   },
 
   {
     value: "1",
     desc: "Agents Float Request",
     action: "Needs action",
+    url: "/agents",
   },
 ];
 
@@ -51,6 +56,8 @@ const STAT = [
 ];
 
 export default function OperationsStat() {
+  const router = useRouter();
+
   const bg = {
     kyc: "bg-[#FEF6E7]",
     dispute: "bg-[#FBEAE9]",
@@ -77,7 +84,14 @@ export default function OperationsStat() {
               {item.desc}
             </p>
             <div className="flex items-center gap-[4px]">
-              <p className={`font-[500] text-[10px] text-[#6C6C6C]`}>{item.action}</p>
+              <p
+                onClick={() => {
+                  if (item.url) router.push(item.url);
+                }}
+                className={`font-[500] text-[10px] text-[#6C6C6C] cursor-pointer`}
+              >
+                {item.action}
+              </p>
               {item.desc !== "Open Disputes" && <ArrowRight color="#6C6C6C" />}
             </div>
           </div>

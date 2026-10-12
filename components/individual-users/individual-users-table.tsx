@@ -3,123 +3,21 @@
 import React, { useMemo, useState } from "react";
 import { SearchInput } from "../ui/search-input";
 import Select from "../ui/select";
+import Badge, { type BadgeVariant } from "../ui/badge";
 import { useRouter } from "next/navigation";
+import { initialUsers, type User, type UserStatus } from "./user-data";
 
-type UserStatus = "Active" | "Dormant" | "Suspended";
-
-interface User {
-  id: number;
-  name: string;
-  kycLevel: "TIER 1" | "TIER 2" | "TIER 3" | "Pending";
-  phoneNumber: string;
-  flags: number;
-  dateJoined: string;
-  status: UserStatus;
-}
-
-const sampleUsers: Omit<User, "id">[] = [
-  {
-    name: "Joshua Akindele",
-    kycLevel: "TIER 3",
-    phoneNumber: "0816 249 0242",
-    flags: 0,
-    dateJoined: "Feb 14, 2026",
-    status: "Active",
-  },
-  {
-    name: "Emeka Eze",
-    kycLevel: "Pending",
-    phoneNumber: "0816 249 0242",
-    flags: 0,
-    dateJoined: "Feb 14, 2026",
-    status: "Dormant",
-  },
-  {
-    name: "Emeka Eze",
-    kycLevel: "TIER 3",
-    phoneNumber: "0816 249 0242",
-    flags: 4,
-    dateJoined: "Feb 14, 2026",
-    status: "Suspended",
-  },
-  {
-    name: "Chidinma Obi",
-    kycLevel: "TIER 2",
-    phoneNumber: "0816 249 0242",
-    flags: 0,
-    dateJoined: "Feb 14, 2026",
-    status: "Active",
-  },
-  {
-    name: "Femi Adeyemi",
-    kycLevel: "TIER 3",
-    phoneNumber: "0816 249 0242",
-    flags: 0,
-    dateJoined: "Feb 14, 2026",
-    status: "Active",
-  },
-  {
-    name: "Nkechi Uba",
-    kycLevel: "TIER 3",
-    phoneNumber: "0816 249 0242",
-    flags: 0,
-    dateJoined: "Feb 14, 2026",
-    status: "Active",
-  },
-  {
-    name: "Nkechi Uba",
-    kycLevel: "TIER 3",
-    phoneNumber: "0816 249 0242",
-    flags: 0,
-    dateJoined: "Feb 14, 2026",
-    status: "Active",
-  },
-  {
-    name: "Gbenga Olanrewaju",
-    kycLevel: "TIER 1",
-    phoneNumber: "0816 249 0242",
-    flags: 0,
-    dateJoined: "Feb 14, 2026",
-    status: "Active",
-  },
-  {
-    name: "Adgeze Nwosu",
-    kycLevel: "TIER 3",
-    phoneNumber: "0816 249 0242",
-    flags: 0,
-    dateJoined: "Feb 14, 2026",
-    status: "Active",
-  },
-  {
-    name: "Emeka Eze",
-    kycLevel: "TIER 3",
-    phoneNumber: "0816 249 0242",
-    flags: 0,
-    dateJoined: "Feb 14, 2026",
-    status: "Active",
-  },
-];
-
-const initialUsers: User[] = Array.from({ length: 128 }, (_, index) => ({
-  ...sampleUsers[index % sampleUsers.length],
-  id: index + 1,
-  dateJoined:
-    index < sampleUsers.length
-      ? "Feb 14, 2026"
-      : `Feb ${String(14 - Math.floor(index / sampleUsers.length)).padStart(2, "0")}, 2026`,
-}));
-
-const statusStyles: Record<UserStatus, string> = {
-  Active: "bg-[#E7F6EC] text-[#078132]",
-  Dormant: "bg-[#ECECEC] text-[#666666]",
-  Suspended: "bg-[#FCE9E8] text-[#D31812]",
+const statusVariants: Record<UserStatus, BadgeVariant> = {
+  Active: "active",
+  Dormant: "dormant",
+  Suspended: "suspended",
 };
 
-const kycStyles: Record<User["kycLevel"], string> = {
-  "TIER 1": "bg-[#B5E5C7] text-[#267446]",
-  "TIER 2": "bg-[#B5E5C7] text-[#267446]",
-  "TIER 3": "bg-[#B5E5C7] text-[#267446]",
-  Pending: "bg-[#FFE3B0] text-[#B87300]",
+const kycVariants: Record<User["kycLevel"], BadgeVariant> = {
+  "TIER 1": "tier",
+  "TIER 2": "tier",
+  "TIER 3": "tier",
+  Pending: "pending",
 };
 
 export default function IndividualUsersTable() {
@@ -197,7 +95,7 @@ export default function IndividualUsersTable() {
           />
         </div>
 
-        <div className="w-[80px] max-lg:w-full">
+        <div className="w-[100px] max-lg:w-full">
           <Select
             options={[
               { value: "latest", label: "Latest" },
@@ -251,17 +149,17 @@ export default function IndividualUsersTable() {
           <tbody>
             {visibleUsers.map((user) => (
               <tr
-                onClick={() => router.push(`/individual-users/${user.id}`)}
+                onClick={() =>
+                  router.push(
+                    `/individual-users/${user.id}?status=${encodeURIComponent(user.status)}`,
+                  )
+                }
                 key={user.id}
                 className="h-[62px] border-b border-[#D2D2D2] last:border-b-0 cursor-pointer"
               >
                 <td className="whitespace-nowrap px-[12px]">{user.name}</td>
                 <td className="px-[12px]">
-                  <span
-                    className={`inline-flex rounded-full px-[8px] py-[4px] text-[9px] font-[600] ${kycStyles[user.kycLevel]}`}
-                  >
-                    {user.kycLevel}
-                  </span>
+                  <Badge variant={kycVariants[user.kycLevel]}>{user.kycLevel}</Badge>
                 </td>
                 <td className="whitespace-nowrap px-[12px]">{user.phoneNumber}</td>
                 <td className={`px-[12px] ${user.flags > 0 ? "text-[#D31812]" : ""}`}>
@@ -269,18 +167,15 @@ export default function IndividualUsersTable() {
                 </td>
                 <td className="whitespace-nowrap px-[12px]">{user.dateJoined}</td>
                 <td className="px-[12px]">
-                  <span
-                    className={`inline-flex rounded-full px-[10px] py-[5px] text-[10px] font-[500] ${statusStyles[user.status]}`}
-                  >
-                    {user.status}
-                  </span>
+                  <Badge variant={statusVariants[user.status]}>{user.status}</Badge>
                 </td>
                 <td className="px-[12px] text-center">
                   <button
                     type="button"
-                    onClick={() =>
-                      updateStatus(user.id, user.status === "Suspended" ? "Active" : "Suspended")
-                    }
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      updateStatus(user.id, user.status === "Suspended" ? "Active" : "Suspended");
+                    }}
                     className={`whitespace-nowrap font-[500] ${user.status === "Suspended" ? "text-[#04907E]" : "text-[#D31812]"}`}
                   >
                     {user.status === "Suspended" ? "Reactivate" : "Suspend"}
