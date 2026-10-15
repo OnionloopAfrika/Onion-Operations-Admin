@@ -4,6 +4,7 @@ import React, { useMemo, useState } from "react";
 import { RightArrowIcon, WarningIcon } from "../icons/svgs";
 import { SearchInput } from "../ui/search-input";
 import Select from "../ui/select";
+import Badge, { type BadgeVariant } from "../ui/badge";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button";
 import Input from "../ui/input";
@@ -114,15 +115,15 @@ const agents: Agent[] = Array.from({ length: 128 }, (_, index) => ({
 
 const pageSize = 10;
 
-const statusStyles: Record<AgentStatus, string> = {
-  Active: "bg-[#E7F6EC] text-[#078132]",
-  Flagged: "bg-[#FCE9E8] text-[#D31812]",
+const statusVariants: Record<AgentStatus, BadgeVariant> = {
+  Active: "active",
+  Flagged: "flagged",
 };
 
-const pendingActionStyles: Record<PendingAction, string> = {
-  None: "text-[#C7C7C7]",
-  Discrepancy: "bg-[#FCE9E8] text-[#D31812]",
-  "Float Request": "bg-[#FFF4E2] text-[#C57900]",
+const pendingActionVariants: Record<PendingAction, BadgeVariant | undefined> = {
+  None: undefined,
+  Discrepancy: "discrepancy",
+  "Float Request": "float_request",
 };
 
 export default function AgentsTable() {
@@ -253,18 +254,21 @@ export default function AgentsTable() {
                   <td className="whitespace-nowrap px-[12px]">{agent.name}</td>
                   <td className="whitespace-nowrap px-[12px]">{agent.location}</td>
                   <td className="px-[12px]">
-                    <span
-                      className={`inline-flex whitespace-nowrap rounded-full px-[10px] py-[5px] text-[10px] font-[500] ${statusStyles[agent.status]}`}
-                    >
+                    <Badge variant={statusVariants[agent.status]} className="whitespace-nowrap">
                       {agent.status}
-                    </span>
+                    </Badge>
                   </td>
                   <td className="px-[12px]">
-                    <span
-                      className={`inline-flex whitespace-nowrap rounded-full px-[10px] py-[5px] text-[10px] font-[500] ${pendingActionStyles[agent.pendingAction]}`}
-                    >
-                      {agent.pendingAction}
-                    </span>
+                    {agent.pendingAction === "None" ? (
+                      <span className="text-[#C7C7C7]">{agent.pendingAction}</span>
+                    ) : (
+                      <Badge
+                        variant={pendingActionVariants[agent.pendingAction]}
+                        className="whitespace-nowrap"
+                      >
+                        {agent.pendingAction}
+                      </Badge>
+                    )}
                   </td>
                   <td className="whitespace-nowrap px-[12px]">{agent.floatCap}</td>
                   <td className="whitespace-nowrap px-[12px]">{agent.feeRate}</td>
@@ -272,9 +276,15 @@ export default function AgentsTable() {
                     <button
                       onClick={(event) => {
                         event.stopPropagation();
-                        router.push(
-                          `/agents/${agent.id}?status=${agent.status}&pendingAction=${agent.pendingAction} `,
-                        );
+                        const params = new URLSearchParams({
+                          name: agent.name,
+                          location: agent.location,
+                          status: agent.status,
+                          pendingAction: agent.pendingAction,
+                          floatCap: agent.floatCap,
+                          feeRate: agent.feeRate,
+                        });
+                        router.push(`/agents/${agent.id}?${params.toString()}`);
                       }}
                       type="button"
                       aria-label={`View ${agent.name}`}

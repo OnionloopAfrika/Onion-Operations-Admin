@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import { ArrowRight, SearchIcon } from "../icons/svgs";
+import Badge, { type BadgeVariant } from "../ui/badge";
 import Button from "../ui/button";
 import Input from "../ui/input";
 import { Modal } from "../ui/modal";
@@ -70,10 +71,10 @@ const REPORT_HISTORY: ReportHistoryItem[] = [
   },
 ];
 
-const STATUS_STYLES: Record<ReportStatus, string> = {
-  Ready: "bg-[#E7F6EC] text-[#008A3A]",
-  Failed: "bg-[#FBEAE9] text-[#CB1A14]",
-  Read: "bg-[#E7F6EC] text-[#008A3A]",
+const STATUS_VARIANTS: Record<ReportStatus, BadgeVariant> = {
+  Ready: "ready",
+  Failed: "failed",
+  Read: "resolved",
 };
 
 export default function ReportHistory() {
@@ -124,7 +125,6 @@ export default function ReportHistory() {
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search TXN ID, customer name, type, Amount"
               prefixicon={<SearchIcon color="#8A8A8A" />}
-              className="rounded-[8px] border-[#E5E7EB] bg-[#F7F7F7] shadow-[0_4px_12px_rgb(0,0,0,0.04)] placeholder:text-[14px] placeholder:text-[#8A8A8A]"
             />
           </div>
 
@@ -138,7 +138,6 @@ export default function ReportHistory() {
                 { value: "failed", label: "Failed" },
                 { value: "read", label: "Read" },
               ]}
-              className="w-full min-w-0 rounded-[6px] bg-white"
             />
           </div>
 
@@ -152,7 +151,6 @@ export default function ReportHistory() {
                 { value: "OnionCrew", label: "OnionCrew" },
                 { value: "OnionMega", label: "OnionMega" },
               ]}
-              className="w-full min-w-0 rounded-[6px] bg-white"
             />
           </div>
 
@@ -162,7 +160,6 @@ export default function ReportHistory() {
               value={date}
               onChange={(event) => setDate(event.target.value)}
               aria-label="Filter by date"
-              className="w-[148px] shrink-0 bg-white"
             />
           </div>
         </div>
@@ -210,11 +207,7 @@ export default function ReportHistory() {
                 <td className="px-[12px]">{item.generatedBy}</td>
                 <td className="px-[12px]">{item.date}</td>
                 <td className="px-[12px]">
-                  <span
-                    className={`inline-flex min-w-[105px] items-center justify-center rounded-full px-[16px] py-[6px] font-[500] ${STATUS_STYLES[item.status]}`}
-                  >
-                    {item.status}
-                  </span>
+                  <Badge variant={STATUS_VARIANTS[item.status]}>{item.status}</Badge>
                 </td>
                 <td className="px-[24px] text-right">
                   <button

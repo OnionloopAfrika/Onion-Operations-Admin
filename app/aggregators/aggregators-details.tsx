@@ -10,8 +10,36 @@ import Input from "@/components/ui/input";
 import Select from "@/components/ui/select";
 import ModalHeader from "@/components/ui/modal-header";
 import Textarea from "@/components/ui/textarea";
+import Badge, { type BadgeVariant } from "@/components/ui/badge";
+import { useParams, useSearchParams } from "next/navigation";
 
 export default function AggregatorsDetails() {
+  const searchParams = useSearchParams();
+  const routeParams = useParams<{ id: string }>();
+  const id = Number(routeParams.id);
+  const name = searchParams.get("name") ?? "Ada Cash Point";
+  const region = searchParams.get("region") ?? "Ikeja, Lagos";
+  const commissionPayout = searchParams.get("commissionPayout") ?? "₦1.84M";
+  const targetProgress = searchParams.get("targetProgress") ?? "58 / 50";
+  const targetMet = searchParams.get("targetMet") === "true";
+  const [completedTarget, targetTotal] = targetProgress.split("/").map(Number);
+  const targetPercent =
+    Number.isFinite(completedTarget) && Number.isFinite(targetTotal) && targetTotal > 0
+      ? Math.min((completedTarget / targetTotal) * 100, 100)
+      : 0;
+  const status = searchParams.get("status");
+  const statusVariant: BadgeVariant =
+    status === "Active - Under Review"
+      ? "under_review"
+      : status === "Pending Approval"
+        ? "pending"
+        : "active";
+  const initials = name
+    .split(/\s+/)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
   const [openTerminate, setOpenTerminate] = useState(false);
   const [target, setTarget] = useState(false);
   const [payout, setPayout] = useState(false);
@@ -61,17 +89,22 @@ export default function AggregatorsDetails() {
         <div className="flex justify-between items-center max-lg:grid max-lg:grid-cols-1 max-lg:gap-[20px]">
           <div className="flex items-center gap-[12px]">
             <div className="w-[40px] h-[40px] rounded-[8px] bg-[#D6F0DF] flex justify-center items-center font-[600] text-[16px] text-[#024E44]">
-              AD
+              {initials}
             </div>
 
             <div className="space-y-[4px]">
               <div className="flex items-center gap-[10px]">
-                <p className="font-[600] text-[16px] text-[#131313]">Ada Cash Point</p>
-
-                <Button variant="active" size="status_btn" children="Active" />
+                <p className="font-[600] text-[16px] text-[#131313]">{name}</p>
+                {status ? (
+                  <Badge variant={statusVariant}>{status}</Badge>
+                ) : (
+                  <span className="font-[500] text-[12px] text-[#6C6C6C]">Status unavailable</span>
+                )}
               </div>
 
-              <p className="font-[500] text-[14px] text-[#6C6C6C]">AG-1042 · Ikeja, Lagos</p>
+              <p className="font-[500] text-[14px] text-[#6C6C6C]">
+                {Number.isInteger(id) ? `AG-${String(id).padStart(4, "0")}` : "AG"} · {region}
+              </p>
             </div>
           </div>
 
@@ -93,17 +126,20 @@ export default function AggregatorsDetails() {
           </div>
 
           <div className="space-y-[8px]">
-            <p className="font-[500] text-[14px] text-[#6C6C6C]">
-              50 new active accounts / month 0 alerts 78%
-            </p>
+            <p className="font-[500] text-[14px] text-[#6C6C6C]">Accounts onboarded this period</p>
 
-            <div className="w-full h-[8px] rounded-full bg-[#04802E]"></div>
+            <div className="w-full h-[8px] rounded-full bg-[#E5E7EB]">
+              <div
+                className="h-full rounded-full bg-[#04802E]"
+                style={{ width: `${targetPercent}%` }}
+              />
+            </div>
 
             <div className="flex justify-between items-center">
-              <p className="font-[500] text-[14px] text-[#000000]">58 / 50</p>
-              <p className="font-[500] text-[12px] text-[#04802E]">
-                ✓ Target met — commission unlocked
-              </p>
+              <p className="font-[500] text-[14px] text-[#000000]">{targetProgress}</p>
+              {targetMet && (
+                <Badge variant="ready">Target met — commission unlocked</Badge>
+              )}
             </div>
           </div>
         </div>
@@ -115,7 +151,9 @@ export default function AggregatorsDetails() {
               key={i}
             >
               <p className="font-[400] text-[10px] text-[#6C6C6C]">{item.title}</p>
-              <p className="font-[600] text-[14px] text-[#000000]">{item.amount}</p>
+              <p className="font-[600] text-[14px] text-[#000000]">
+                {item.title === "Commission on Target" ? commissionPayout : item.amount}
+              </p>
 
               {item.title === "Commission on Target" && (
                 <p
@@ -169,7 +207,7 @@ export default function AggregatorsDetails() {
               </p>
 
               <p className="text-center font-[400] text-[16px] text-[#363636]">
-                You are about to end the partnership with Ada Cash Point.
+                You are about to end the partnership with {name}.
               </p>
 
               <p className="text-center font-[400] text-[16px] text-[#363636]">
@@ -194,7 +232,7 @@ export default function AggregatorsDetails() {
       <Modal open={target} onOpenChange={setTarget}>
         <div className="space-y-[64px]">
           <div className="space-y-[16px]">
-            <ModalHeader title=" Set Target  — Obi & Co Field Team" />
+            <ModalHeader title={`Set Target — ${name}`} />
 
             <div className="space-y-[24px]">
               <Select label="Target Metric" options={[]} />
@@ -225,19 +263,19 @@ export default function AggregatorsDetails() {
         <div className="space-y-[64px]">
           <div className="space-y-[24px]">
             <div className="space-y-[8px]">
-              <ModalHeader title=" Process Commission Payout — Obi & Co Field Team" />
+              <ModalHeader title={`Process Commission Payout — ${name}`} />
 
               <p className="font-[400] text-[16px] text-[#363636] text-center">
                 Target met:{" "}
                 <span className="font-[600] text-[16px] text-[#363636]">
-                  50 new active accounts / month
+                  {targetTotal || "Not set"} new active accounts / month
                 </span>{" "}
-                (58/50)
+                ({targetProgress})
               </p>
 
               <p className="font-[400] text-[16px] text-[#363636] text-center">
                 Commission due:{" "}
-                <span className="font-[600] text-[16px] text-[#363636]"> ₦1.84M</span>
+                <span className="font-[600] text-[16px] text-[#363636]"> {commissionPayout}</span>
               </p>
             </div>
 

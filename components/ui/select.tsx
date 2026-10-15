@@ -24,7 +24,7 @@ const Select: React.FC<SelectProps> = ({
   options,
   disabled = false,
   icon,
-  className
+  className,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLabel, setSelectedLabel] = useState("");
@@ -37,10 +37,7 @@ const Select: React.FC<SelectProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -57,11 +54,7 @@ const Select: React.FC<SelectProps> = ({
 
   return (
     <div className="w-full flex flex-col gap-[8px]" ref={containerRef}>
-      {label && (
-        <label className="block font-semibold text-[12px] text-[#131313]">
-          {label}
-        </label>
-      )}
+      {label && <label className="block font-semibold text-[12px] text-[#131313]">{label}</label>}
 
       <div className="relative">
         <button
@@ -79,9 +72,7 @@ const Select: React.FC<SelectProps> = ({
         >
           <span
             className={
-              selectedLabel
-                ? "text-xs font-semibold text-start "
-                : " text-start text-[#8A8A8A]"
+              selectedLabel ? "text-xs font-semibold text-start " : " text-start text-[#8A8A8A]"
             }
           >
             {selectedLabel || placeholder}

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button";
 import Textarea from "../ui/textarea";
+import Badge, { type BadgeVariant } from "../ui/badge";
 import { DotIcon } from "../icons/svgs";
 
 const disputes = [
@@ -45,11 +46,11 @@ const disputes = [
   },
 ] as const;
 
-const statusStyles: Record<(typeof disputes)[number]["status"], string> = {
-  Open: "bg-[#FEF6E7] text-[#DD900D] text-[14px]",
-  "In Review": "bg-[#FFF5E5] text-[#C77700] text-[14px]",
-  Escalated: "bg-[#FBEAE9] text-[#CB1A14] text-[14px]",
-  Resolved: "bg-[#E7F6EC] text-[#04802E] text-[14px]",
+const statusVariants: Record<(typeof disputes)[number]["status"], BadgeVariant> = {
+  Open: "open",
+  "In Review": "in_review",
+  Escalated: "escalated",
+  Resolved: "resolved",
 };
 
 export default function DisputeTable() {
@@ -118,11 +119,9 @@ export default function DisputeTable() {
                   {dispute.priority}
                 </td>
                 <td className="px-[15px] font-[500] text-[14px] text-[#6C6C6C]">
-                  <span
-                    className={`inline-flex whitespace-nowrap rounded-full px-[12px] py-[6px] font-[500] ${statusStyles[dispute.status]}`}
-                  >
+                  <Badge variant={statusVariants[dispute.status]} className="whitespace-nowrap">
                     {dispute.status}
-                  </span>
+                  </Badge>
                 </td>
               </tr>
             ))}

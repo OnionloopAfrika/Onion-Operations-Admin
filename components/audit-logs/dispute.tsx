@@ -2,10 +2,17 @@
 
 import { useMemo, useState } from "react";
 import { SearchIcon } from "../icons/svgs";
+import Badge, { type BadgeVariant } from "../ui/badge";
 import Input from "../ui/input";
 import Select from "../ui/select";
 
 type DisputeStatus = "Escalated" | "Resolved" | "In review";
+
+const statusVariants: Record<DisputeStatus, BadgeVariant> = {
+  Escalated: "escalated",
+  Resolved: "resolved",
+  "In review": "in_review",
+};
 
 interface DisputeLogEntry {
   admin: string;
@@ -112,8 +119,7 @@ export default function Dispute() {
           .join(" ")
           .toLowerCase()
           .includes(query);
-      const matchesStatus =
-        statusFilter === "all" || entry.status.toLowerCase() === statusFilter;
+      const matchesStatus = statusFilter === "all" || entry.status.toLowerCase() === statusFilter;
 
       return matchesSearch && matchesStatus;
     });
@@ -132,11 +138,7 @@ export default function Dispute() {
           />
         </div>
         <div className="w-[130px] max-lg:w-full">
-          <Select
-            onValueChange={setStatusFilter}
-            options={statusOptions}
-            value={statusFilter}
-          />
+          <Select onValueChange={setStatusFilter} options={statusOptions} value={statusFilter} />
         </div>
         <div className="w-[146px] max-lg:w-full">
           <Input
@@ -207,17 +209,7 @@ export default function Dispute() {
                   <span className="mt-[2px] block max-lg:text-[12px]">{entry.recipientDetail}</span>
                 </td>
                 <td className="px-[14px]">
-                  <span
-                    className={`inline-flex min-h-[30px] items-center rounded-full px-[12px] font-[500] max-lg:text-[12px] ${
-                      entry.status === "Resolved"
-                        ? "bg-[#E7F6EC] text-[#078132]"
-                        : entry.status === "In review"
-                          ? "bg-[#FFF4E2] text-[#C57900]"
-                          : "bg-[#FCE9E8] text-[#D31812]"
-                    }`}
-                  >
-                    {entry.status}
-                  </span>
+                  <Badge variant={statusVariants[entry.status]}>{entry.status}</Badge>
                 </td>
                 <td className="whitespace-nowrap px-[14px] font-[500] max-lg:text-[12px]">
                   {entry.time}

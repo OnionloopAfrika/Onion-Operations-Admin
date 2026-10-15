@@ -1,9 +1,12 @@
+import Badge from "../ui/badge";
+
 const sentNotifications = [
   {
     recipient: "Amina Yusuf",
     type: "KYC Rejected",
     channel: "In-app + Email",
-    content: "Your KYC verification was unsuccessful. Please review your details and resubmit your documents.",
+    content:
+      "Your KYC verification was unsuccessful. Please review your details and resubmit your documents.",
     sent: "Today 5:48am",
     status: "Active",
   },
@@ -27,7 +30,8 @@ const sentNotifications = [
     recipient: "Fatima Bello",
     type: "KYC On Hold",
     channel: "In-app + Email",
-    content: "Your KYC verification is on hold while we review the additional information provided.",
+    content:
+      "Your KYC verification is on hold while we review the additional information provided.",
     sent: "Today 3:42am",
     status: "Active",
   },
@@ -97,22 +101,12 @@ export default function SentAll({ notificationType = "All" }: SentAllProps) {
                 <td className="px-[16px] py-[20px]">{notification.recipient}</td>
                 <td className="px-[16px] py-[20px]">{notification.type}</td>
                 <td className="px-[16px] py-[20px]">{notification.channel}</td>
-                <td className="px-[16px] py-[20px] whitespace-normal">
-                  {notification.content}
-                </td>
-                <td className="whitespace-nowrap px-[16px] py-[20px]">
-                  {notification.sent}
-                </td>
+                <td className="px-[16px] py-[20px] whitespace-normal">{notification.content}</td>
+                <td className="whitespace-nowrap px-[16px] py-[20px]">{notification.sent}</td>
                 <td className="px-[16px] py-[20px]">
-                  <span
-                    className={`inline-flex min-w-[112px] items-center justify-center rounded-full px-[16px] py-[10px] font-[500] ${
-                      notification.status === "Pending"
-                        ? "bg-[#FFF4DB] text-[#B7791F]"
-                        : "bg-[#E7F6EC] text-[#078132]"
-                    }`}
-                  >
+                  <Badge variant={notification.status === "Pending" ? "pending" : "active"}>
                     {notification.status}
-                  </span>
+                  </Badge>
                 </td>
               </tr>
             ))}

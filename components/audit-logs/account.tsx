@@ -2,10 +2,16 @@
 
 import { useMemo, useState } from "react";
 import { SearchIcon } from "../icons/svgs";
+import Badge, { type BadgeVariant } from "../ui/badge";
 import Input from "../ui/input";
 import Select from "../ui/select";
 
 type AccountStatus = "Suspended" | "Reactivated";
+
+const statusVariants: Record<AccountStatus, BadgeVariant> = {
+  Suspended: "suspended",
+  Reactivated: "active",
+};
 
 interface AccountLogEntry {
   admin: string;
@@ -201,15 +207,7 @@ export default function Account() {
                   <span className="mt-[2px] block max-lg:text-[12px]">{entry.recipientDetail}</span>
                 </td>
                 <td className="px-[14px]">
-                  <span
-                    className={`inline-flex min-h-[30px] items-center rounded-full px-[12px] font-[500] max-lg:text-[12px] ${
-                      entry.status === "Reactivated"
-                        ? "bg-[#E7F6EC] text-[#078132]"
-                        : "bg-[#FCE9E8] text-[#D31812]"
-                    }`}
-                  >
-                    {entry.status}
-                  </span>
+                  <Badge variant={statusVariants[entry.status]}>{entry.status}</Badge>
                 </td>
                 <td className="whitespace-nowrap px-[14px] font-[500] max-lg:text-[12px]">
                   {entry.time}

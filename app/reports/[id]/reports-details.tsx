@@ -1,6 +1,7 @@
 import React from "react";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import Button from "@/components/ui/button";
+import Badge, { type BadgeVariant } from "@/components/ui/badge";
 import { OnionTableIcon } from "@/components/icons/svgs";
 import Image from "next/image";
 
@@ -15,12 +16,25 @@ const DISPUTES = [
   { id: "DSP-327", type: "Merchant Dispute", status: "Resolved", priority: "Low" },
 ];
 
-const STATUS_STYLES: Record<string, string> = {
-  Open: "bg-[#E7F6EC] text-[#008A3A]",
-  "In review": "bg-[#FEF6E7] text-[#DD900D]",
-  Escalated: "bg-[#E5F0FF] text-[#2474D2]",
-  Resolved: "bg-[#E7F6EC] text-[#008A3A]",
+const STATUS_VARIANTS: Record<string, BadgeVariant> = {
+  Open: "open",
+  "In review": "in_review",
+  Escalated: "escalated",
+  Resolved: "resolved",
 };
+
+function DecisionStatus({ decision }: { decision: string }) {
+  const [label, ...details] = decision.split(" - ");
+  const variant: BadgeVariant =
+    label === "Approved" ? "resolved" : label === "Rejected" ? "failed" : "pending";
+
+  return (
+    <span className="inline-flex flex-wrap items-center gap-[6px]">
+      <Badge variant={variant}>{label}</Badge>
+      {details.length > 0 && <span>{details.join(" - ")}</span>}
+    </span>
+  );
+}
 
 const PRIORITY_STYLES: Record<string, string> = {
   High: "bg-[#D91E18]",
@@ -110,11 +124,7 @@ function DisputeResolutionReport() {
                 <td className="px-[16px]">{dispute.id}</td>
                 <td className="px-[16px]">{dispute.type}</td>
                 <td className="px-[16px]">
-                  <span
-                    className={`inline-flex min-w-[88px] justify-center rounded-full px-[12px] py-[5px] font-medium ${STATUS_STYLES[dispute.status]}`}
-                  >
-                    {dispute.status}
-                  </span>
+                  <Badge variant={STATUS_VARIANTS[dispute.status]}>{dispute.status}</Badge>
                 </td>
                 <td className="px-[16px]">
                   <span className="inline-flex items-center gap-[6px]">
@@ -365,9 +375,7 @@ function MerchantOnboardingReport() {
                 <td className="px-[12px]">{application.business}</td>
                 <td className="px-[12px]">{application.category}</td>
                 <td className="px-[12px]">
-                  <span className="inline-flex rounded-full bg-[#FEF6E7] px-[10px] py-[4px] text-[10px] font-medium text-[#DD900D]">
-                    Pending approval
-                  </span>
+                  <Badge variant="pending">Pending approval</Badge>
                 </td>
                 <td className="px-[12px]">{application.fee}</td>
               </tr>
@@ -490,7 +498,9 @@ function KycApprovalReport() {
               >
                 <td className="px-[12px]">{decision.applicant}</td>
                 <td className="px-[12px]">{decision.type}</td>
-                <td className="px-[12px]">{decision.decision}</td>
+                <td className="px-[12px]">
+                  <DecisionStatus decision={decision.decision} />
+                </td>
                 <td className="px-[12px]">{decision.reviewer}</td>
                 <td className="whitespace-nowrap px-[12px]">May 19,2026 at 09:15am</td>
               </tr>
@@ -611,9 +621,24 @@ function AgentFloatPayoutReport() {
               >
                 <td className="px-[12px]">{agent.name}</td>
                 <td className="px-[12px]">{agent.balance}</td>
-                <td className="px-[12px]">{agent.topUps}</td>
+                <td className="px-[12px]">
+                  {agent.topUps.endsWith(" - Pending") ? (
+                    <span className="inline-flex items-center gap-[6px]">
+                      <span>{agent.topUps.slice(0, -" - Pending".length)}</span>
+                      <Badge variant="pending">Pending</Badge>
+                    </span>
+                  ) : (
+                    agent.topUps
+                  )}
+                </td>
                 <td className="px-[12px]">{agent.payout}</td>
-                <td className="px-[12px]">{agent.discrepancies}</td>
+                <td className="px-[12px]">
+                  {agent.discrepancies === "Flagged" ? (
+                    <Badge variant="flagged">{agent.discrepancies}</Badge>
+                  ) : (
+                    agent.discrepancies
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
