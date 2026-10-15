@@ -2,10 +2,17 @@
 
 import { useMemo, useState } from "react";
 import { SearchIcon } from "../icons/svgs";
+import Badge, { type BadgeVariant } from "../ui/badge";
 import Input from "../ui/input";
 import Select from "../ui/select";
 
 type ConfigStatus = "Rejected" | "Approved" | "Pending finance approval";
+
+const statusVariants: Record<ConfigStatus, BadgeVariant> = {
+  Rejected: "failed",
+  Approved: "active",
+  "Pending finance approval": "pending",
+};
 
 interface ConfigLogEntry {
   admin: string;
@@ -82,8 +89,7 @@ export default function Config() {
           .join(" ")
           .toLowerCase()
           .includes(query);
-      const matchesStatus =
-        statusFilter === "all" || entry.status.toLowerCase() === statusFilter;
+      const matchesStatus = statusFilter === "all" || entry.status.toLowerCase() === statusFilter;
 
       return matchesSearch && matchesStatus;
     });
@@ -102,11 +108,7 @@ export default function Config() {
           />
         </div>
         <div className="w-[130px] max-lg:w-full">
-          <Select
-            onValueChange={setStatusFilter}
-            options={statusOptions}
-            value={statusFilter}
-          />
+          <Select onValueChange={setStatusFilter} options={statusOptions} value={statusFilter} />
         </div>
         <div className="w-[146px] max-lg:w-full">
           <Input
@@ -174,17 +176,9 @@ export default function Config() {
                 <td className="px-[14px] font-[500] max-lg:text-[12px]">{entry.action}</td>
                 <td className="px-[14px] font-[500] max-lg:text-[12px]">{entry.recipient}</td>
                 <td className="px-[14px]">
-                  <span
-                    className={`inline-flex min-h-[30px] items-center whitespace-nowrap rounded-full px-[12px] font-[500] max-lg:text-[12px] ${
-                      entry.status === "Approved"
-                        ? "bg-[#E7F6EC] text-[#078132]"
-                        : entry.status === "Pending finance approval"
-                          ? "bg-[#FFF4E2] text-[#C57900]"
-                          : "bg-[#FCE9E8] text-[#D31812]"
-                    }`}
-                  >
+                  <Badge variant={statusVariants[entry.status]} className="whitespace-nowrap">
                     {entry.status}
-                  </span>
+                  </Badge>
                 </td>
                 <td className="whitespace-nowrap px-[14px] font-[500] max-lg:text-[12px]">
                   {entry.time}

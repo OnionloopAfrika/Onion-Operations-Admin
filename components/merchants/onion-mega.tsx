@@ -4,12 +4,18 @@ import React, { useMemo, useState } from "react";
 import { RightArrowIcon } from "../icons/svgs";
 import { SearchInput } from "../ui/search-input";
 import Select from "../ui/select";
+import Badge, { type BadgeVariant } from "../ui/badge";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button";
 import Input from "../ui/input";
 import { useRouter } from "next/navigation";
 
 type MerchantStatus = "Active" | "Pending Approval";
+
+const statusVariants: Record<MerchantStatus, BadgeVariant> = {
+  Active: "active",
+  "Pending Approval": "pending",
+};
 
 interface Merchant {
   id: number;
@@ -177,7 +183,6 @@ export default function OnionMega() {
           <div className="w-full max-w-[288px]">
             <SearchInput
               categories={[]}
-              className="!h-[38px] !rounded-[6px] !border-[#D6D6D6] !bg-white !pl-[34px] !pr-[10px] !text-[11px]"
               value={search}
               onChange={(value) => updateFilter(() => setSearch(value))}
               placeholder="Search by name, phone number..."
@@ -193,7 +198,6 @@ export default function OnionMega() {
               ]}
               value={statusFilter}
               onValueChange={(value) => updateFilter(() => setStatusFilter(value))}
-              className="!h-[38px] !whitespace-nowrap !rounded-[6px] !border-[#D6D6D6] !bg-white !p-[12px] !pr-[30px] !font-normal !text-[11px] !text-[#687992]"
             />
           </div>
 
@@ -205,7 +209,6 @@ export default function OnionMega() {
               ]}
               value={sortOrder}
               onValueChange={(value) => updateFilter(() => setSortOrder(value))}
-              className="!h-[38px] !rounded-[6px] !border-[#D6D6D6] !bg-white !p-[12px] !pr-[28px] !font-normal !text-[11px] !text-[#687992]"
             />
           </div>
         </div>
@@ -259,21 +262,25 @@ export default function OnionMega() {
                   <td className="whitespace-nowrap px-[12px]">{merchant.staff}</td>
                   <td className="whitespace-nowrap px-[12px]">{merchant.feeRate}</td>
                   <td className="px-[12px]">
-                    <span
-                      className={`inline-flex whitespace-nowrap rounded-full px-[10px] py-[5px] text-[10px] font-[500] ${
-                        merchant.status === "Active"
-                          ? "bg-[#E7F6EC] text-[#078132]"
-                          : "bg-[#FFF4E2] text-[#C57900]"
-                      }`}
-                    >
+                    <Badge variant={statusVariants[merchant.status]} className="whitespace-nowrap">
                       {merchant.status}
-                    </span>
+                    </Badge>
                   </td>
                   <td className="px-[12px] text-center">
                     <button
-                      onClick={() =>
-                        router.push(`/merchants/${merchant.id}?source=${merchant.source}`)
-                      }
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        const params = new URLSearchParams({
+                          source: merchant.source,
+                          business: merchant.business,
+                          owner: merchant.owner,
+                          staff: merchant.staff,
+                          branches: merchant.branches,
+                          feeRate: merchant.feeRate,
+                          status: merchant.status,
+                        });
+                        router.push(`/merchants/${merchant.id}?${params.toString()}`);
+                      }}
                       type="button"
                       aria-label={`View ${merchant.business}`}
                       className="inline-flex items-center justify-center text-[#8A8A8A] cursor-pointer"

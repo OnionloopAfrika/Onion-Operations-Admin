@@ -4,101 +4,19 @@ import React, { useMemo, useState } from "react";
 import { RightArrowIcon } from "../icons/svgs";
 import { SearchInput } from "../ui/search-input";
 import Select from "../ui/select";
+import Badge, { type BadgeVariant } from "../ui/badge";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button";
 import Input from "../ui/input";
 import { useRouter } from "next/navigation";
+import { onionSoloMerchants } from "./onion-solo-data";
+import type { MerchantStatus } from "./onion-solo-data";
 
-type MerchantStatus = "Active" | "Pending Approval";
+const statusVariants: Record<MerchantStatus, BadgeVariant> = {
+  Active: "active",
+  "Pending Approval": "pending",
+};
 
-interface Merchant {
-  id: number;
-  source: "OnionSolo";
-  business: string;
-  owner: string;
-  feeRate: string;
-  status: MerchantStatus;
-  createdAt: number;
-}
-
-const sampleMerchants: Omit<Merchant, "id" | "createdAt">[] = [
-  {
-    source: "OnionSolo",
-    business: "Joshua Akindele",
-    owner: "Joshua Akindele",
-    feeRate: "1.5%",
-    status: "Active",
-  },
-  {
-    source: "OnionSolo",
-    business: "Emeka Eze",
-    owner: "Emeka Eze",
-    feeRate: "1.5%",
-    status: "Pending Approval",
-  },
-  {
-    source: "OnionSolo",
-    business: "Emeka Eze",
-    owner: "Emeka Eze",
-    feeRate: "1.5%",
-    status: "Active",
-  },
-  {
-    source: "OnionSolo",
-    business: "Chidinma Obi",
-    owner: "Chidinma Obi",
-    feeRate: "1.5%",
-    status: "Active",
-  },
-  {
-    source: "OnionSolo",
-    business: "Femi Adeyemi",
-    owner: "Femi Adeyemi",
-    feeRate: "1.5%",
-    status: "Pending Approval",
-  },
-  {
-    source: "OnionSolo",
-    business: "Nkechi Uba",
-    owner: "Nkechi Uba",
-    feeRate: "1.5%",
-    status: "Active",
-  },
-  {
-    source: "OnionSolo",
-    business: "Nkechi Uba",
-    owner: "Nkechi Uba",
-    feeRate: "1.5%",
-    status: "Active",
-  },
-  {
-    source: "OnionSolo",
-    business: "Gbenga Olanrewaju",
-    owner: "Gbenga Olanrewaju",
-    feeRate: "1.5%",
-    status: "Active",
-  },
-  {
-    source: "OnionSolo",
-    business: "Adgeze Nwosu",
-    owner: "Adgeze Nwosu",
-    feeRate: "1.5%",
-    status: "Active",
-  },
-  {
-    source: "OnionSolo",
-    business: "Emeka Eze",
-    owner: "Emeka Eze",
-    feeRate: "1.5%",
-    status: "Active",
-  },
-];
-
-const merchants: Merchant[] = Array.from({ length: 128 }, (_, index) => ({
-  ...sampleMerchants[index % sampleMerchants.length],
-  id: index + 1,
-  createdAt: 128 - index,
-}));
 
 const pageSize = 10;
 
@@ -115,7 +33,7 @@ export default function OnionSolo() {
   const filteredMerchants = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return merchants
+    return onionSoloMerchants
       .filter((merchant) => `${merchant.business} ${merchant.owner}`.toLowerCase().includes(query))
       .filter(
         (merchant) => statusFilter === "all" || merchant.status.toLowerCase() === statusFilter,
@@ -224,21 +142,22 @@ export default function OnionSolo() {
                   <td className="whitespace-nowrap px-[12px]">{merchant.owner}</td>
                   <td className="whitespace-nowrap px-[12px]">{merchant.feeRate}</td>
                   <td className="px-[12px]">
-                    <span
-                      className={`inline-flex whitespace-nowrap rounded-full px-[10px] py-[5px] text-[10px] font-[500] ${
-                        merchant.status === "Active"
-                          ? "bg-[#E7F6EC] text-[#078132]"
-                          : "bg-[#FFF4E2] text-[#C57900]"
-                      }`}
-                    >
+                    <Badge variant={statusVariants[merchant.status]} className="whitespace-nowrap">
                       {merchant.status}
-                    </span>
+                    </Badge>
                   </td>
                   <td className="px-[12px] text-center">
                     <button
                       onClick={(event) => {
                         event.stopPropagation();
-                        router.push(`/merchants/${merchant.id}?source=${merchant.source}`);
+                        const params = new URLSearchParams({
+                          source: merchant.source,
+                          business: merchant.business,
+                          owner: merchant.owner,
+                          feeRate: merchant.feeRate,
+                          status: merchant.status,
+                        });
+                        router.push(`/merchants/${merchant.id}?${params.toString()}`);
                       }}
                       type="button"
                       aria-label={`View ${merchant.business}`}

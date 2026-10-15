@@ -4,6 +4,7 @@ import React, { useMemo, useState } from "react";
 import { RightArrowIcon } from "../icons/svgs";
 import { SearchInput } from "../ui/search-input";
 import Select from "../ui/select";
+import Badge, { type BadgeVariant } from "../ui/badge";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button";
 import Input from "../ui/input";
@@ -113,10 +114,10 @@ const aggregators: Aggregator[] = Array.from({ length: 128 }, (_, index) => ({
 
 const pageSize = 10;
 
-const statusStyles: Record<AggregatorStatus, string> = {
-  Active: "bg-[#E7F6EC] text-[#078132]",
-  "Active - Under Review": "bg-[#FFF4E2] text-[#C57900]",
-  "Pending Approval": "bg-[#FFF4E2] text-[#C57900]",
+const statusVariants: Record<AggregatorStatus, BadgeVariant> = {
+  Active: "active",
+  "Active - Under Review": "under_review",
+  "Pending Approval": "under_review",
 };
 
 export default function AggregatorTable() {
@@ -261,25 +262,30 @@ export default function AggregatorTable() {
                       >
                         {aggregator.targetProgress}
                       </span>
-                      {aggregator.targetMet && (
-                        <span className="inline-flex rounded-full bg-[#E7F6EC] px-[10px] py-[5px] text-[10px] font-[500] text-[#078132]">
-                          Target met
-                        </span>
-                      )}
+                      {aggregator.targetMet && <Badge variant="active"> Target met</Badge>}
                     </div>
                   </td>
                   <td className="px-[12px]">
-                    <span
-                      className={`inline-flex whitespace-nowrap rounded-full px-[10px] py-[5px] text-[10px] font-[500] ${statusStyles[aggregator.status]}`}
+                    <Badge
+                      variant={statusVariants[aggregator.status]}
+                      className="whitespace-nowrap"
                     >
                       {aggregator.status}
-                    </span>
+                    </Badge>
                   </td>
                   <td className="px-[12px] text-center">
                     <button
                       onClick={(event) => {
                         event.stopPropagation();
-                        router.push(`/aggregators/${aggregator.id}`);
+                        const params = new URLSearchParams({
+                          name: aggregator.name,
+                          region: aggregator.region,
+                          commissionPayout: aggregator.commissionPayout,
+                          targetProgress: aggregator.targetProgress,
+                          targetMet: String(aggregator.targetMet),
+                          status: aggregator.status,
+                        });
+                        router.push(`/aggregators/${aggregator.id}?${params.toString()}`);
                       }}
                       type="button"
                       aria-label={`View ${aggregator.name} in ${aggregator.region}`}
